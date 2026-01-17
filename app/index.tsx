@@ -56,7 +56,7 @@ export default function HomeScreen() {
         style={styles.keyboardAvoid}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={0}>
-        <View style={[styles.content, { paddingTop: insets.top + 16 }]}>
+        <View style={[styles.content, { paddingTop: insets.top + 8 }]}>
           {!hasMessages ? (
             <>
               <ChatHeader title="Hello there!" subtitle="How can I help you today?" />
@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
   },
   spacer: {
     flex: 1,
