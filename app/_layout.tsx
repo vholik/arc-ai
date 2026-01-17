@@ -4,6 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 
 import { Colors } from '@/constants/theme';
+import { TRPCProvider } from '@/lib/trpc';
 
 const AppTheme: Theme = {
   ...DarkTheme,
@@ -20,12 +21,14 @@ const AppTheme: Theme = {
 
 export default function RootLayout() {
   return (
-    <ThemeProvider value={AppTheme}>
-      <Stack>
-        <Stack.Screen name="index" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
-      </Stack>
-      <StatusBar style="light" />
-    </ThemeProvider>
+    <TRPCProvider>
+      <ThemeProvider value={AppTheme}>
+        <Stack>
+          <Stack.Screen name="index" options={{ headerShown: false }} />
+          <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
+        </Stack>
+        <StatusBar style="light" />
+      </ThemeProvider>
+    </TRPCProvider>
   );
 }
