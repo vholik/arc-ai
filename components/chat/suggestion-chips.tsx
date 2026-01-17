@@ -1,4 +1,5 @@
-import { FlatList, StyleSheet, TouchableOpacity } from "react-native";
+import { FlatList, Pressable, StyleSheet } from "react-native";
+import Animated, { FadeInDown } from "react-native-reanimated";
 
 import { ThemedText } from "@/components/themed-text";
 import { Colors } from "@/constants/theme";
@@ -22,14 +23,15 @@ export function SuggestionChips({
       keyExtractor={(_, index) => index.toString()}
       style={styles.list}
       contentContainerStyle={styles.container}
-      renderItem={({ item }) => (
-        <TouchableOpacity
-          style={styles.chip}
-          onPress={() => onSuggestionPress(item)}
-          activeOpacity={0.7}
-        >
-          <ThemedText style={styles.text}>{item}</ThemedText>
-        </TouchableOpacity>
+      renderItem={({ item, index }) => (
+        <Animated.View entering={FadeInDown.delay(index * 50).springify()}>
+          <Pressable
+            style={styles.chip}
+            onPress={() => onSuggestionPress(item)}
+          >
+            <ThemedText style={styles.text}>{item}</ThemedText>
+          </Pressable>
+        </Animated.View>
       )}
     />
   );

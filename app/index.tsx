@@ -6,17 +6,22 @@ import { ChatHeader } from '@/components/chat/chat-header';
 import { ChatInput } from '@/components/chat/chat-input';
 import { SuggestionChips } from '@/components/chat/suggestion-chips';
 import { ThemedView } from '@/components/themed-view';
-
-const SUGGESTIONS = [
-  'Analyze my progress photos',
-  'Create a workout plan for me',
-  'How much protein should I eat?',
-  'Log my workout',
-];
+import { trpc } from '@/lib/trpc';
 
 export default function HomeScreen() {
   const [message, setMessage] = useState('');
   const insets = useSafeAreaInsets();
+
+  const { data: suggestionsData } = trpc.chat.getSuggestions.useQuery();
+
+  const sendMessage = trpc.chat.sendMessage.useMutation({
+    onSuccess: (data) => {
+      console.log('Response:', data.response);
+    },
+    onError: (error) => {
+      console.error('Error sending message:', error.message);
+    },
+  });
 
   const handleSuggestionPress = (suggestion: string) => {
     setMessage(suggestion);
@@ -24,7 +29,7 @@ export default function HomeScreen() {
 
   const handleSend = () => {
     if (message.trim()) {
-      console.log('Sending:', message);
+      sendMessage.mutate({ message: message.trim() });
       setMessage('');
     }
   };
@@ -43,7 +48,12 @@ export default function HomeScreen() {
           <View style={styles.spacer} />
         </ScrollView>
 
-        <SuggestionChips suggestions={SUGGESTIONS} onSuggestionPress={handleSuggestionPress} />
+        {suggestionsData?.suggestions && (
+          <SuggestionChips
+            suggestions={suggestionsData.suggestions}
+            onSuggestionPress={handleSuggestionPress}
+          />
+        )}
 
         <ChatInput
           value={message}

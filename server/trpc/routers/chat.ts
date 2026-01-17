@@ -1,8 +1,19 @@
-import { z } from 'zod';
+import { z } from "zod";
 
-import { publicProcedure, router } from '../trpc';
+import { publicProcedure, router } from "../trpc";
+
+const SUGGESTIONS = [
+  "Analyze my progress photos",
+  "Create a workout plan for me",
+  "How much protein should I eat?",
+  "Log my workout",
+];
 
 export const chatRouter = router({
+  getSuggestions: publicProcedure.query(() => {
+    return { suggestions: SUGGESTIONS };
+  }),
+
   sendMessage: publicProcedure
     .input(
       z.object({
@@ -11,7 +22,7 @@ export const chatRouter = router({
     )
     .mutation(async ({ input }) => {
       // TODO: Implement actual chat logic (e.g., call AI API)
-      console.log('Received message:', input.message);
+      console.log("Received message:", input.message);
 
       return {
         id: Date.now().toString(),
@@ -19,11 +30,4 @@ export const chatRouter = router({
         timestamp: new Date().toISOString(),
       };
     }),
-
-  getHistory: publicProcedure.query(async () => {
-    // TODO: Implement actual history retrieval
-    return {
-      messages: [],
-    };
-  }),
 });
