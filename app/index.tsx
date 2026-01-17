@@ -5,50 +5,42 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ChatHeader } from '@/components/chat/chat-header';
 import { ChatInput } from '@/components/chat/chat-input';
 import { ChatMessages } from '@/components/chat/chat-messages';
-import { Message } from '@/components/chat/chat-message';
 import { SuggestionChips } from '@/components/chat/suggestion-chips';
 import { ThemedView } from '@/components/themed-view';
+import { useChat } from '@/hooks/use-chat';
 import { trpc } from '@/lib/trpc';
 
 export default function HomeScreen() {
-  const [message, setMessage] = useState('');
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [inputMessage, setInputMessage] = useState('');
   const insets = useSafeAreaInsets();
 
   const { data: suggestionsData } = trpc.chat.getSuggestions.useQuery();
 
-  const sendMessage = trpc.chat.sendMessage.useMutation({
-    onSuccess: (data) => {
-      const assistantMessage: Message = {
-        id: data.id,
-        role: 'assistant',
-        content: data.response,
-      };
-      setMessages((prev) => [...prev, assistantMessage]);
-    },
+  const { messages, isLoading, append } = useChat({
     onError: (error) => {
-      console.error('Error sending message:', error.message);
+      console.error('Chat error:', error);
     },
   });
 
   const handleSuggestionPress = (suggestion: string) => {
-    setMessage(suggestion);
+    setInputMessage(suggestion);
   };
 
   const handleSend = () => {
-    if (message.trim()) {
-      const userMessage: Message = {
-        id: Date.now().toString(),
+    if (inputMessage.trim() && !isLoading) {
+      append({
         role: 'user',
-        content: message.trim(),
-      };
-      setMessages((prev) => [...prev, userMessage]);
-      sendMessage.mutate({ message: message.trim() });
-      setMessage('');
+        content: inputMessage.trim(),
+      });
+      setInputMessage('');
     }
   };
 
   const hasMessages = messages.length > 0;
+
+  // Show thinking when loading and last message is from user (no assistant response yet)
+  const isThinking =
+    isLoading && messages.length > 0 && messages[messages.length - 1]?.content === '';
 
   return (
     <ThemedView style={styles.container}>
@@ -63,7 +55,10 @@ export default function HomeScreen() {
               <View style={styles.spacer} />
             </>
           ) : (
-            <ChatMessages messages={messages} isThinking={sendMessage.isPending} />
+            <ChatMessages
+              messages={messages.filter((m) => m.content !== '')}
+              isThinking={isThinking}
+            />
           )}
         </View>
 
@@ -75,8 +70,8 @@ export default function HomeScreen() {
         )}
 
         <ChatInput
-          value={message}
-          onChangeText={setMessage}
+          value={inputMessage}
+          onChangeText={setInputMessage}
           onSend={handleSend}
         />
       </KeyboardAvoidingView>
