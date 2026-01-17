@@ -1,7 +1,6 @@
 import { StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { ThemedText } from '@/components/themed-text';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Colors } from '@/constants/theme';
 
@@ -10,7 +9,6 @@ interface ChatInputProps {
   onChangeText: (text: string) => void;
   onSend: () => void;
   onAttachPress?: () => void;
-  modelName?: string;
 }
 
 const colors = Colors.dark;
@@ -20,7 +18,6 @@ export function ChatInput({
   onChangeText,
   onSend,
   onAttachPress,
-  modelName = 'Gemini 2.5 Flash Lite',
 }: ChatInputProps) {
   const insets = useSafeAreaInsets();
   const hasMessage = value.trim().length > 0;
@@ -43,10 +40,6 @@ export function ChatInput({
             onPress={onAttachPress}
             activeOpacity={0.7}>
             <IconSymbol name="paperclip" size={20} color={colors.icon} />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.modelSelector} activeOpacity={0.7}>
-            <IconSymbol name="sparkles" size={16} color="#a855f7" />
-            <ThemedText style={styles.modelText}>{modelName}</ThemedText>
           </TouchableOpacity>
           <View style={styles.spacer} />
           <TouchableOpacity
@@ -91,17 +84,6 @@ const styles = StyleSheet.create({
   },
   actionButton: {
     padding: 4,
-  },
-  modelSelector: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    paddingVertical: 4,
-    paddingHorizontal: 4,
-  },
-  modelText: {
-    fontSize: 13,
-    opacity: 0.8,
   },
   spacer: {
     flex: 1,

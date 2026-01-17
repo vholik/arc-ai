@@ -8,10 +8,10 @@ import { SuggestionChips } from '@/components/chat/suggestion-chips';
 import { ThemedView } from '@/components/themed-view';
 
 const SUGGESTIONS = [
-  'What are the advantages of using Next.js?',
-  "Write code to demonstrate Dijkstra's algorithm",
-  'Help me write an essay about Silicon Valley',
-  'What is the weather in San Francisco?',
+  'Analyze my progress photos',
+  'Create a workout plan for me',
+  'How much protein should I eat?',
+  'Log my workout',
 ];
 
 export default function HomeScreen() {

@@ -1,7 +1,7 @@
-import { FlatList, StyleSheet, TouchableOpacity } from 'react-native';
+import { FlatList, StyleSheet, TouchableOpacity } from "react-native";
 
-import { ThemedText } from '@/components/themed-text';
-import { Colors } from '@/constants/theme';
+import { ThemedText } from "@/components/themed-text";
+import { Colors } from "@/constants/theme";
 
 interface SuggestionChipsProps {
   suggestions: string[];
@@ -10,19 +10,24 @@ interface SuggestionChipsProps {
 
 const colors = Colors.dark;
 
-export function SuggestionChips({ suggestions, onSuggestionPress }: SuggestionChipsProps) {
+export function SuggestionChips({
+  suggestions,
+  onSuggestionPress,
+}: SuggestionChipsProps) {
   return (
     <FlatList
       data={suggestions}
       horizontal
       showsHorizontalScrollIndicator={false}
       keyExtractor={(_, index) => index.toString()}
+      style={styles.list}
       contentContainerStyle={styles.container}
       renderItem={({ item }) => (
         <TouchableOpacity
           style={styles.chip}
           onPress={() => onSuggestionPress(item)}
-          activeOpacity={0.7}>
+          activeOpacity={0.7}
+        >
           <ThemedText style={styles.text}>{item}</ThemedText>
         </TouchableOpacity>
       )}
@@ -31,19 +36,23 @@ export function SuggestionChips({ suggestions, onSuggestionPress }: SuggestionCh
 }
 
 const styles = StyleSheet.create({
+  list: {
+    flexGrow: 0,
+    flexShrink: 0,
+  },
   container: {
     paddingHorizontal: 16,
     gap: 8,
-    paddingVertical: 8,
+    alignItems: "center",
   },
   chip: {
     backgroundColor: colors.card,
-    borderRadius: 20,
+    borderRadius: 16,
     paddingVertical: 8,
     paddingHorizontal: 14,
   },
   text: {
-    fontSize: 13,
-    lineHeight: 18,
+    fontSize: 14,
+    color: '#FFFFFF',
   },
 });
