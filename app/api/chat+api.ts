@@ -5,7 +5,7 @@ const openai = createOpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-const model = openai("gpt-4o-mini");
+const model = openai("gpt-4o");
 
 const systemPrompt = `You are a helpful fitness and health assistant.
 You help users with workout plans, nutrition advice, progress tracking, and general health questions.

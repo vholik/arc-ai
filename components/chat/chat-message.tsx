@@ -51,14 +51,15 @@ const styles = StyleSheet.create({
     marginVertical: 4,
     paddingHorizontal: 4,
     flexDirection: 'row',
-    alignItems: 'center',
     gap: 10,
   },
   userContainer: {
     justifyContent: 'flex-end',
+    alignItems: 'center',
   },
   assistantContainer: {
     justifyContent: 'flex-start',
+    alignItems: 'flex-start',
   },
   avatarContainer: {
     width: 28,
