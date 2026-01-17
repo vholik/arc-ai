@@ -21,6 +21,8 @@ export const chatRouter = router({
       })
     )
     .mutation(async ({ input }) => {
+      // Simulate processing delay
+      await new Promise((resolve) => setTimeout(resolve, 3000));
       // TODO: Implement actual chat logic (e.g., call AI API)
       console.log("Received message:", input.message);
 
