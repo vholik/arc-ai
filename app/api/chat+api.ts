@@ -1,5 +1,5 @@
 import { createOpenAI } from "@ai-sdk/openai";
-import { streamText } from "ai";
+import { convertToModelMessages, streamText, UIMessage } from "ai";
 
 const openai = createOpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -11,32 +11,23 @@ const systemPrompt = `You are a helpful fitness and health assistant.
 You help users with workout plans, nutrition advice, progress tracking, and general health questions.
 Keep responses concise, friendly, and actionable.`;
 
-interface ChatMessage {
-  role: "user" | "assistant";
-  content: string;
-}
 
-export async function POST(request: Request) {
-  try {
-    const { messages } = (await request.json()) as { messages: ChatMessage[] };
 
-    const modelMessages = messages.map((m) => ({
-      role: m.role as "user" | "assistant",
-      content: m.content,
-    }));
+export async function POST(req: Request) {
+    const { messages }: { messages: UIMessage[] } = await req.json();
+
 
     const result = streamText({
       model,
       system: systemPrompt,
-      messages: modelMessages,
+      messages: await convertToModelMessages(messages),
     });
 
-    return result.toTextStreamResponse();
-  } catch (error) {
-    console.error("Chat API error:", error);
-    return new Response(JSON.stringify({ error: "Internal server error" }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
-  }
+    return result.toUIMessageStreamResponse({
+      headers: {
+        'Content-Type': 'application/octet-stream',
+        'Content-Encoding': 'none',
+      }}
+    );
+
 }

@@ -1,5 +1,7 @@
+import { useChat } from '@ai-sdk/react';
+import { DefaultChatTransport } from 'ai';
 import { useState } from 'react';
-import { StyleSheet, View, KeyboardAvoidingView, Platform } from 'react-native';
+import { KeyboardAvoidingView, Platform, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ChatHeader } from '@/components/chat/chat-header';
@@ -7,8 +9,9 @@ import { ChatInput } from '@/components/chat/chat-input';
 import { ChatMessages } from '@/components/chat/chat-messages';
 import { SuggestionChips } from '@/components/chat/suggestion-chips';
 import { ThemedView } from '@/components/themed-view';
-import { useChat } from '@/hooks/use-chat';
+import { generateAPIUrl } from '@/lib/api';
 import { trpc } from '@/lib/trpc';
+import { fetch as expoFetch } from 'expo/fetch';
 
 export default function HomeScreen() {
   const [inputMessage, setInputMessage] = useState('');
@@ -16,11 +19,18 @@ export default function HomeScreen() {
 
   const { data: suggestionsData } = trpc.chat.getSuggestions.useQuery();
 
-  const { messages, isLoading, append } = useChat({
+
+  const { messages, sendMessage, status } = useChat({
+    transport: new DefaultChatTransport({
+      fetch: expoFetch as unknown as typeof globalThis.fetch,
+      api: generateAPIUrl('/api/chat'),
+    }),
     onError: (error) => {
       console.error('Chat error:', error);
     },
   });
+
+  const isLoading = status === 'streaming' || status === 'submitted';
 
   const handleSuggestionPress = (suggestion: string) => {
     setInputMessage(suggestion);
@@ -28,19 +38,17 @@ export default function HomeScreen() {
 
   const handleSend = () => {
     if (inputMessage.trim() && !isLoading) {
-      append({
-        role: 'user',
-        content: inputMessage.trim(),
-      });
+      sendMessage({ text: inputMessage.trim() });
       setInputMessage('');
     }
   };
 
   const hasMessages = messages.length > 0;
 
-  // Show thinking when loading and last message is from user (no assistant response yet)
-  const isThinking =
-    isLoading && messages.length > 0 && messages[messages.length - 1]?.content === '';
+  // Show thinking when loading and last message has no text content yet
+  const lastMessage = messages[messages.length - 1];
+  const lastMessageText = lastMessage?.parts?.find((p) => p.type === 'text');
+  const isThinking = isLoading && hasMessages && !lastMessageText;
 
   return (
     <ThemedView style={styles.container}>
@@ -56,7 +64,7 @@ export default function HomeScreen() {
             </>
           ) : (
             <ChatMessages
-              messages={messages.filter((m) => m.content !== '')}
+              messages={messages.filter((m) => m.parts?.some((p) => p.type === 'text' && p.text))}
               isThinking={isThinking}
             />
           )}

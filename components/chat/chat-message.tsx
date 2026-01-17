@@ -1,3 +1,4 @@
+import type { UIMessage } from '@ai-sdk/react';
 import { StyleSheet, View } from 'react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
 
@@ -5,11 +6,7 @@ import { ThemedText } from '@/components/themed-text';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Colors } from '@/constants/theme';
 
-export interface Message {
-  id: string;
-  role: 'user' | 'assistant';
-  content: string;
-}
+export type Message = UIMessage;
 
 interface ChatMessageProps {
   message: Message;
@@ -20,6 +17,11 @@ const colors = Colors.dark;
 
 export function ChatMessage({ message, index }: ChatMessageProps) {
   const isUser = message.role === 'user';
+
+  const textContent = message.parts
+    ?.filter((part): part is { type: 'text'; text: string } => part.type === 'text')
+    .map((part) => part.text)
+    .join('');
 
   return (
     <Animated.View
@@ -39,7 +41,7 @@ export function ChatMessage({ message, index }: ChatMessageProps) {
           isUser ? styles.userBubble : styles.assistantBubble,
         ]}>
         <ThemedText style={[styles.text, isUser && styles.userText]}>
-          {message.content}
+          {textContent}
         </ThemedText>
       </View>
     </Animated.View>
